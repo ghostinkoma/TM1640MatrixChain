@@ -1,4 +1,4 @@
-/*
+/*c:\Users\sinhex\Desktop\TM1640test\TM1640MatrixChain-main\src\matrixchain.cpp c:\Users\sinhex\Desktop\TM1640test\TM1640MatrixChain-main\src\matrixchain.h c:\Users\sinhex\Desktop\TM1640test\TM1640MatrixChain-main\src\tm1640.cpp c:\Users\sinhex\Desktop\TM1640test\TM1640MatrixChain-main\src\tm1640.h
  * TM1640MatrixChain - Basic Demo
  * 
  * Features demonstrated:
@@ -65,7 +65,7 @@ void setup() {
     // === Draw static content ===
 
     // Japanese text (8x8 font)
-    chain->setFont(u8g2_font_japanese1_tf);
+    chain->setFont(u8g2_font_maniac_tf);
     chain->drawUTF8(0, 0, "こんにちは", ORANGE);
 
     // English text (5x7 font)
