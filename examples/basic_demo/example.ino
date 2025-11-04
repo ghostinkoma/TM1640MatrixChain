@@ -1,5 +1,4 @@
-/*c:\Users\sinhex\Desktop\TM1640test\TM1640MatrixChain-main\src\matrixchain.cpp c:\Users\sinhex\Desktop\TM1640test\TM1640MatrixChain-main\src\matrixchain.h c:\Users\sinhex\Desktop\TM1640test\TM1640MatrixChain-main\src\tm1640.cpp c:\Users\sinhex\Desktop\TM1640test\TM1640MatrixChain-main\src\tm1640.h
- * TM1640MatrixChain - Basic Demo
+/* TM1640MatrixChain - Basic Demo
  * 
  * Features demonstrated:
  *  - 8-module horizontal chain (shared CLK, individual DIO)
