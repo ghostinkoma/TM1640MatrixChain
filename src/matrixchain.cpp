@@ -3,6 +3,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <Arduino.h>
+#include <U8g2lib.h> 
 
 MatrixChain::MatrixChain(TM1640* modules[], uint8_t count, Orientation orient, uint8_t layoutCols)
     : _modules(modules), _count(count), _orient(orient) {
@@ -103,7 +104,7 @@ void MatrixChain::get_gram_linear(uint8_t out[], uint32_t out_len) const {
 }
 
 void MatrixChain::print_matrix(const char* str, uint16_t x, uint8_t y, FontType font_type, uint8_t color) {
-    const uint8_t* font = (font_type == FONT_8X8) ? u8g2_font_japanese1_tf : u8g2_font_5x7_tf;
+    const uint8_t* font = (font_type == FONT_8X8) ? u8g2_font_maniac_tf : u8g2_font_5x7_tf;
     setFont(font);
     drawUTF8(x, y, str, color);
 }
@@ -205,7 +206,6 @@ void MatrixChain::sync_extended_to_modules() {
         }
     }
 }
-
 void MatrixChain::beginU8g2Virtual() {
     if (_temp_buffer) return;
 
@@ -215,15 +215,19 @@ void MatrixChain::beginU8g2Virtual() {
     _temp_buffer = (uint8_t*)malloc(buf_size);
     if (!_temp_buffer) return;
 
-    u8g2_SetupBuffer(&u8g2_virt, _temp_buffer, virt_h, u8g2_ll_hvline_vertical_top_lsb, u8g2_cb_r0);
+    u8g2_SetupBuffer(&u8g2_virt, _temp_buffer, virt_h, u8g2_ll_hvline_vertical_top_lsb, &u8g2_cb_r0);
     u8g2_SetFontMode(&u8g2_virt, 1);
     u8g2_SetFontDirection(&u8g2_virt, 0);
+#if defined(u8g2_SetUserPtr)
     u8g2_SetUserPtr(&u8g2_virt, this);
+#elif defined(u8g2_SetUserPointer)
+    u8g2_SetUserPointer(&u8g2_virt, this);
+#endif
 }
 
 void MatrixChain::setFont(const uint8_t* font) {
     if (!font || !_temp_buffer) return;
-    u8g2_SetFont(&u8g2_virt, (const u8g2_font_t*)font);
+    u8g2_SetFont(&u8g2_virt, (const uint8_t*)font);
 }
 
 int16_t MatrixChain::drawUTF8(uint16_t x, uint8_t y, const char* str, uint8_t color) {
