@@ -59,44 +59,52 @@ void TM1640::hw_pin_init() {
 #endif
 }
 
+/**
+ * Sends a single byte over the TM1640's bit-banged I2C-like protocol.
+ * Supports FAST mode for ESP32/AVR with direct register access for performance.
+ * Timing: CLK low for data setup, CLK high for latching (1us hold per datasheet).
+ * LSB first transmission.
+ */
 void TM1640::send_byte_hw(uint8_t b) const {
 #ifdef FAST_TM1640
 #if IS_ESP32
+    // ESP32 optimized: Use GPIO output registers for minimal overhead.
     uint32_t clk_mask = _clk_mask;
     uint32_t dio_mask = _dio_mask;
     for (uint8_t i = 0; i < 8; ++i) {
-        *_gpio_out_clr = clk_mask;
-        if (b & (1 << i)) *_gpio_out = dio_mask; else *_gpio_out_clr = dio_mask;
-        esp_rom_delay_us(1);
-        *_gpio_out = clk_mask;
-        esp_rom_delay_us(1);
+        *_gpio_out_clr = clk_mask;  // CLK low: Setup data
+        if (b & (1 << i)) *_gpio_out = dio_mask; else *_gpio_out_clr = dio_mask;  // DIO = bit i (LSB first)
+        esp_rom_delay_us(1);  // Hold data low phase (min 1us per datasheet)
+        *_gpio_out = clk_mask;  // CLK high: Latch data
+        esp_rom_delay_us(1);  // Hold high phase (min 1us)
     }
-    *_gpio_out = clk_mask;
+    *_gpio_out = clk_mask;  // Idle CLK high
 #elif IS_AVR328 || IS_LGT8F328
+    // AVR optimized: Direct port manipulation for speed on 328p/LGT8F.
     uint8_t clk_mask = (uint8_t)_clk_mask;
     uint8_t dio_mask = (uint8_t)_dio_mask;
-    DDR_REG |= (clk_mask | dio_mask);
+    DDR_REG |= (clk_mask | dio_mask);  // Set pins as outputs
     for (uint8_t i = 0; i < 8; ++i) {
-        PORT_REG &= ~clk_mask;
-        if (b & (1 << i)) PORT_REG |= dio_mask; else PORT_REG &= ~dio_mask;
-        _delay_us(1);
-        PORT_REG |= clk_mask;
-        _delay_us(1);
+        PORT_REG &= ~clk_mask;  // CLK low
+        if (b & (1 << i)) PORT_REG |= dio_mask; else PORT_REG &= ~dio_mask;  // DIO bit
+        _delay_us(1);  // Data hold low
+        PORT_REG |= clk_mask;  // CLK high
+        _delay_us(1);  // Latch hold
     }
-    PORT_REG |= clk_mask;
+    PORT_REG |= clk_mask;  // Idle high
 #else
-    // Fallback: standard bit-banging
+    // Fallback: Standard digitalWrite for portability (slower but works everywhere).
     for (uint8_t i = 0; i < 8; ++i) {
-        digitalWrite(_clkPin, LOW);
-        digitalWrite(_dioPin, (b & (1 << i)) ? HIGH : LOW);
-        delayMicroseconds(1);
-        digitalWrite(_clkPin, HIGH);
-        delayMicroseconds(1);
+        digitalWrite(_clkPin, LOW);  // CLK low: Prepare data
+        digitalWrite(_dioPin, (b & (1 << i)) ? HIGH : LOW);  // Set DIO to bit i
+        delayMicroseconds(1);  // Setup/hold time
+        digitalWrite(_clkPin, HIGH);  // CLK high: Transfer
+        delayMicroseconds(1);  // Latch time
     }
-    digitalWrite(_clkPin, HIGH);
+    digitalWrite(_clkPin, HIGH);  // Idle state
 #endif
 #else
-    // Standard stable implementation
+    // Standard stable bit-banging: No FAST mode, reliable for debugging.
     for (uint8_t i = 0; i < 8; ++i) {
         digitalWrite(_clkPin, LOW);
         digitalWrite(_dioPin, (b & (1 << i)) ? HIGH : LOW);
@@ -108,17 +116,54 @@ void TM1640::send_byte_hw(uint8_t b) const {
 #endif
 }
 
+/**
+ * Writes the red and green planes from shadow buffers to TM1640 SRAM.
+ * Sequence: Start cond -> Cmd/Data -> End cond (critical for command recognition).
+ * Red plane: GRID1-8 (addr 00-07H), Green: GRID9-16 (addr 08-0FH).
+ * Fixes orange-only bug by adding explicit start/end conditions.
+ * Assumes planeRed/Green are 8-byte arrays (8x8 matrix rows, MSB first?).
+ */
 void TM1640::write_all_from_shadow() {
-    if (!planeRed || !planeGreen) return;
+    if (!planeRed || !planeGreen) return;  // Skip if buffers invalid (null check for safety)
+    
     pinMode(_dioPin, OUTPUT);
-
-    send_byte_hw(0x44);  // Auto address increment
-    send_byte_hw(0xC0);  // Start address 0
-    for (uint8_t i = 0; i < 8; ++i) send_byte_hw(planeRed[i]);
-    for (uint8_t i = 0; i < 8; ++i) send_byte_hw(planeGreen[i]);
-    send_byte_hw(0x88 | _duty);  // Display on + duty cycle
-
+    pinMode(_clkPin, OUTPUT);  // Ensure CLK output for start/end
+    
+    // Start condition: CLK high, DIO high -> low (initiates frame per datasheet)
+    digitalWrite(_clkPin, HIGH);
+    digitalWrite(_dioPin, HIGH);
+    delayMicroseconds(1);  // Stabilize
+    digitalWrite(_dioPin, LOW);  // Edge trigger
+    delayMicroseconds(1);
+    
+    // Command: Auto-increment address mode (write multiple bytes sequentially)
+    send_byte_hw(0x44);  // 01000100: Data set command, auto addr inc (B3=1)
+    
+    // Address: Start at 00H for GRID1
+    send_byte_hw(0xC0);  // 11000000: Display address 00H
+    
+    // Write red plane (8 bytes for rows 1-8)
+    for (uint8_t i = 0; i < 8; ++i) {
+        send_byte_hw(planeRed[i]);  // Red LED segments (upper grid)
+    }
+    
+    // Write green plane (continues auto-inc to addr 08H for rows 9-16)
+    for (uint8_t i = 0; i < 8; ++i) {
+        send_byte_hw(planeGreen[i]);  // Green LED segments (lower grid)
+    }
+    
+    // Control: Display on with duty cycle
+    send_byte_hw(0x88 | _duty);  // 10001000 | duty: B3=1 on, B0-2=duty (0-7)
+    
+    // End condition: CLK high, DIO low -> high (ends frame, releases bus)
+    digitalWrite(_clkPin, HIGH);
+    delayMicroseconds(1);
+    digitalWrite(_dioPin, HIGH);  // Back to pull-up idle
+    delayMicroseconds(1);
+    
+    // Restore pin modes (DIO input for pull-up, CLK optional)
     pinMode(_dioPin, INPUT);
+    // pinMode(_clkPin, INPUT);  // Uncomment if CLK needs pull-up idle
 }
 
 void TM1640::set_duty(uint8_t val) {
