@@ -8,17 +8,7 @@
 
 /* return codes */
 #define TM1640_OK           0
-#define TM1640_ERR_PARAM   -1
-#define TM1640_ERR_BUF     -2
-#define TM1640_ERR_GPIO    -3
-
-/* event / callback literals */
-#define TM1640_EVT_OK             0x00u
-#define TM1640_EVT_PARAM_ERR      0x01u
-#define TM1640_EVT_BUF_ERR        0x02u
-#define TM1640_EVT_GPIO_ERR       0x03u
-#define TM1640_EVT_SEND_START     0x10u
-#define TM1640_EVT_SEND_COMPLETE  0x11u
+#define TM1640_NG -1
 
 /* command bases and masks */
 #define TM1640_CMD_DATA_BASE     0x00u
