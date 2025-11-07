@@ -6,7 +6,6 @@ static void initclass(uint8_t sclk, uint8_t din) {
   
 }
 
-TM1640::TM1640(uint8_t gpio_sclk, uint8_t gpio_din, int)
-{
+TM1640::TM1640(uint8_t gpio_sclk, uint8_t gpio_din, int){
   initPinsPullup(gpio_sclk, gpio_din);
 }
