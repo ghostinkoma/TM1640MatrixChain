@@ -99,15 +99,6 @@
 #define TM1640_NS_PER_CHAR_I64  ((uint64_t)TM1640_CYCLES_PER_CHAR * (uint64_t)TM1640_NS_PER_CYCLE_I64)
 #define TM1640_NS_PER_STOP_I64  ((uint64_t)TM1640_CYCLES_PER_STOP * (uint64_t)TM1640_NS_PER_CYCLE_I64)
 
-/* event callback type */
-typedef void (*tm1640_event_cb_t)(uint8_t event, void *ctx);
-
-/* Arduino C++ wrapper class
-   Constructor prototype required by caller:
-     TM1640 LEDmatrix(uint8_t gpio_sclk, uint8_t gpio_din, int frequency_khz);
-   If frequency_khz == 0 the implementation should derive a sensible default
-   from TM1640_FCPU_HZ (frequency_khz = TM1640_FCPU_HZ / 1000).
-*/
 class TM1640 {
 public:
   TM1640(uint8_t gpio_sclk, uint8_t gpio_din, int frequency_khz);
@@ -120,10 +111,7 @@ public:
   /* Drawing */
   int DrawAddrInc(const uint8_t *chars, uint16_t len);
   int DrawAddrFix(uint8_t addr, const uint8_t *chars, uint16_t len);
-
-  /* Optional: event callback registration */
-  void SetEventCallback(tm1640_event_cb_t cb, void *ctx);
-
+  
 private:
   uint8_t _sclk_pin;
   uint8_t _din_pin;
@@ -134,5 +122,3 @@ private:
   void _delayForBitTiming(void);
   int _sendRawByte(uint8_t b);
 };
-
-#endif /* TM1640_H */
