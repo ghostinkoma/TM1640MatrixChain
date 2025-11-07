@@ -1,5 +1,3 @@
-tm1640.h (pins as uint8_t)
-
 #ifndef TM1640_H
 #define TM1640_H
 
@@ -32,6 +30,7 @@ tm1640.h (pins as uint8_t)
 
 /* display control bit */
 #define TM1640_DISPLAY_ON_BIT   0x08u
+
 /* duty / pulse width codes (Table 10: 0000 = OFF, 0001..1110 = 1/16 .. 14/16) */
 #define TM1640_DUTY_OFF   0x00u
 #define TM1640_DUTY_1     0x01u
@@ -49,10 +48,9 @@ tm1640.h (pins as uint8_t)
 #define TM1640_DUTY_13    0x0Du
 #define TM1640_DUTY_14    0x0Eu
 
-/* corrected display command constructor: use 4-bit duty field and display-on bit */
+/* single canonical display command constructor */
 #undef TM1640_MAKE_DISPLAY_CMD
-#define TM1640_MAKE_DISPLAY_CMD(on,duty)  ((uint8_t)((TM1640_CMD_DISPLAY_BASE) | ((on) ? TM1640_DISPLAY_ON_BIT : 0x00u) | ((uint8_t)(duty) & 0x0Fu)))
-
+#define TM1640_MAKE_DISPLAY_CMD(on,duty) ((uint8_t)((TM1640_CMD_DISPLAY_BASE) | ((on) ? TM1640_DISPLAY_ON_BIT : 0x00u) | ((uint8_t)(duty) & 0x0Fu)))
 
 /* command constructors */
 #define TM1640_MAKE_DATA_CMD(mode_bits)   ((uint8_t)((TM1640_CMD_DATA_BASE) | ((uint8_t)(mode_bits) & 0x3Fu)))
