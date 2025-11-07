@@ -1,11 +1,29 @@
 #include "tm1640.h"
+#include <Arduino.h>
 
-static void initclass(uint8_t sclk, uint8_t din) {
-  pinMode(sclk, OUTPUT_PULLUP);
-  pinMode(din,  OUTPUT_PULLUP);
-  
+TM1640::TM1640(uint8_t gpio_sclk, uint8_t gpio_din, int frequency_khz)
+  : _sclk_pin(gpio_sclk), _din_pin(gpio_din), _frequency_khz(frequency_khz)
+{
+  pinMode(_sclk_pin, INPUT_PULLUP);
+  pinMode(_din_pin,  INPUT_PULLUP);
 }
 
-TM1640::TM1640(uint8_t gpio_sclk, uint8_t gpio_din, int){
-  initPinsPullup(gpio_sclk, gpio_din);
+/* private helpers */
+void TM1640::_pinSet(uint8_t /*pin*/, bool /*level*/) { 
 }
+void TM1640::_delayForBitTiming(void) { 
+}
+int TM1640::_sendRawByte(uint8_t /*b*/) {
+
+}
+
+/* public API */
+int TM1640::Display(bool /*on*/) {
+}
+int TM1640::Test(bool /*start*/) {
+}
+int TM1640::SetDuty(uint8_t duty){
+}
+int TM1640::DrawAddrInc(const uint8_t * /*chars*/, uint16_t /*len*/) {
+}
+int TM1640::DrawAddrFix(uint8_t /*addr*/, const uint8_t * /*chars*/, uint16_t /*len*/) {}
