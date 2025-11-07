@@ -41,18 +41,11 @@ int TM1640::DrawAddrFix(uint8_t addr, const uint8_t *chars, uint16_t len) {
   return TM1640_OK;
 }
 
-/* low-level helpers: no-op, no timing, always OK where applicable */
-void TM1640::_pinSet(uint8_t pin, bool level) {
-  (void)pin;
-  (void)level;
-}
-
 int TM1640::_sendChars(
   char * sendChars,
   bool addStopBitAfter1stChar,
   bool addStopBitBeforLastChar,
-  int charLength)
-{
+  int charLength){
   (void)sendChars;
   (void)addStopBitAfter1stChar;
   (void)addStopBitBeforLastChar;
