@@ -128,9 +128,6 @@ private:
   uint8_t _sclk_pin;
   uint8_t _din_pin;
   int _frequency_khz; /* 0 = use default derived from TM1640_FCPU_HZ */
-  uint8_t _duty;
-  tm1640_event_cb_t _evt_cb;
-  void *_evt_ctx;
 
   /* low-level helpers (implement in .cpp) */
   void _pinSet(uint8_t pin, bool level);
