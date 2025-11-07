@@ -1,11 +1,14 @@
 #include "tm1640.h"
 #include <Arduino.h>
+int frequency ;
 
 TM1640::TM1640(uint8_t gpio_sclk, uint8_t gpio_din, int frequency_khz)
-  : _sclk_pin(gpio_sclk), _din_pin(gpio_din), _frequency_khz(frequency_khz)
-{
+  : _sclk_pin(gpio_sclk), _din_pin(gpio_din), _frequency_khz(frequency_khz){
   pinMode(_sclk_pin, INPUT_PULLUP);
   pinMode(_din_pin,  INPUT_PULLUP);
+  digitalWrite(_sclk_pin, HIGH);
+  digitalWrite(_din_pin, HIGH);
+  frequency = frequency_khz;
 }
 
 /* private helpers */
