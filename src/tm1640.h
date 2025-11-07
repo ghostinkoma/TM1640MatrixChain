@@ -28,9 +28,9 @@
 #define TM1640_ADDR_MASK         0x0Fu
 #define TM1640_ADDR_MAX          0x0Fu
 
-/* display control bit */
+/* display control bit and duty codes (Table 10) */
 #define TM1640_DISPLAY_ON_BIT 0x08u
-/* duty / pulse width codes (Table 10: 0000 = OFF, 0001..1110 = 1/16 .. 14/16) */
+
 #define TM1640_DUTY_OFF 0x00u
 #define TM1640_DUTY_1   0x01u
 #define TM1640_DUTY_2   0x02u
@@ -47,15 +47,11 @@
 #define TM1640_DUTY_13  0x0Du
 #define TM1640_DUTY_14  0x0Eu
 
-/* single canonical display command constructor (4-bit duty) */
+/* command constructors */
+#define TM1640_MAKE_DATA_CMD(mode_bits)   ((uint8_t)((TM1640_CMD_DATA_BASE) | ((uint8_t)(mode_bits) & 0x3Fu)))
 #undef TM1640_MAKE_DISPLAY_CMD
 #define TM1640_MAKE_DISPLAY_CMD(on,duty) \
   ((uint8_t)(TM1640_CMD_DISPLAY_BASE | ((on) ? TM1640_DISPLAY_ON_BIT : 0x00u) | ((uint8_t)(duty) & 0x0Fu)))
-
-
-/* command constructors */
-#define TM1640_MAKE_DATA_CMD(mode_bits)   ((uint8_t)((TM1640_CMD_DATA_BASE) | ((uint8_t)(mode_bits) & 0x3Fu)))
-#define TM1640_MAKE_DISPLAY_CMD(on,duty)  ((uint8_t)((TM1640_CMD_DISPLAY_BASE) | ((on) ? 0x08u : 0x00u) | ((uint8_t)(duty) & 0x07u)))
 #define TM1640_MAKE_ADDRESS_CMD(addr)     ((uint8_t)((TM1640_CMD_ADDRESS_BASE) | ((uint8_t)(addr) & TM1640_ADDR_MASK)))
 #define TM1640_MAKE_TEST_CMD(code)        ((uint8_t)((TM1640_CMD_TEST_BASE) | ((uint8_t)(code) & 0x3Fu)))
 
@@ -119,7 +115,7 @@ public:
   /* Basic control (return TM1640_OK or negative error) */
   int Display(bool on);
   int Test(bool start);
-  int SetDuty(uint8_t duty);
+  int SetDuty(uint8_t duty); /* implementation should validate 0x00..0x0E and return TM1640_ERR_PARAM on invalid */
 
   /* Drawing */
   int DrawAddrInc(const uint8_t *chars, uint16_t len);
