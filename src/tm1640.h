@@ -115,7 +115,4 @@ private:
     bool addStopBitAfter1stChar,
     bool addStopBitBeforLastChar,
     int charLength);
-}
-  
-  int _sendRawByte(uint8_t b);
 };
