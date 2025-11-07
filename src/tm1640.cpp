@@ -22,11 +22,17 @@ int TM1640::_sendRawByte(uint8_t /*b*/) {
 
 /* public API */
 int TM1640::Display(bool /*on*/) {
+  return 0;
 }
 int TM1640::Test(bool /*start*/) {
+  return 0;
 }
 int TM1640::SetDuty(uint8_t duty){
+  return 0;
 }
 int TM1640::DrawAddrInc(const uint8_t * /*chars*/, uint16_t /*len*/) {
+  return 0;
 }
-int TM1640::DrawAddrFix(uint8_t /*addr*/, const uint8_t * /*chars*/, uint16_t /*len*/) {}
+int TM1640::DrawAddrFix(uint8_t /*addr*/, const uint8_t * /*chars*/, uint16_t /*len*/) {
+  return 0;
+}
