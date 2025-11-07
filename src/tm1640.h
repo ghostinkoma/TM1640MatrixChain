@@ -109,6 +109,13 @@ private:
 
   /* low-level helpers (implement in .cpp) */
   void _pinSet(uint8_t pin, bool level);
-  void _delayForBitTiming(void);
+  
+  int _sendChars(
+    char * sendChars,
+    bool addStopBitAfter1stChar,
+    bool addStopBitBeforLastChar,
+    int charLength);
+}
+  
   int _sendRawByte(uint8_t b);
 };
