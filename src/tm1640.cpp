@@ -7,8 +7,16 @@ TM1640::TM1640(uint8_t gpio_sclk,
               : _sclk_pin(gpio_sclk), 
                 _din_pin(gpio_din),
                 _frequency_khz(frequency_khz){
+  
+
+  // 明示的な代入（assignment）
+  _sclk_pin = gpio_sclk;
+  _din_pin  = gpio_din;
+  _frequency_khz = frequency_khz;
+
   pinMode(_sclk_pin, OUTPUT);
   pinMode(_din_pin, OUTPUT);
+
   digitalWrite(_sclk_pin, HIGH);
   digitalWrite(_din_pin, HIGH);
 }
@@ -46,9 +54,6 @@ int TM1640::_sendChars(
   bool addStopBitAfter1stChar,
   bool addStopBitBeforLastChar,
   int charLength){
-  (void)sendChars;
-  (void)addStopBitAfter1stChar;
-  (void)addStopBitBeforLastChar;
-  (void)charLength;
+
   return TM1640_OK;
 }
