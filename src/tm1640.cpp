@@ -8,8 +8,6 @@ TM1640::TM1640(uint8_t gpio_sclk,
                 _din_pin(gpio_din),
                 _frequency_khz(frequency_khz){
   
-
-  // 明示的な代入（assignment）
   _sclk_pin = gpio_sclk;
   _din_pin  = gpio_din;
   _frequency_khz = frequency_khz;
