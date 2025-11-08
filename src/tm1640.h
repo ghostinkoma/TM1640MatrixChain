@@ -7,8 +7,8 @@
 #include <stddef.h>
 
 /* return codes */
-#define TM1640_OK           0
-#define TM1640_NG -1
+#define TM1640_OK       0
+#define TM1640_NG      -1
 
 /* command bases and masks */
 #define TM1640_CMD_DATA_BASE     0x00u
