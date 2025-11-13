@@ -110,4 +110,5 @@ private:
     bool addStopBitAfter1stChar,
     bool addStopBitBeforLastChar,
     int charLength);
+  void _sendBit(bool bitVal); 
 };
