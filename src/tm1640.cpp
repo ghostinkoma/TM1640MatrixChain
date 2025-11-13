@@ -53,45 +53,43 @@ int TM1640::_sendChars(
   bool addStopBitAfter1stChar,
   bool addStopBitBeforLastChar,
   int charLength){
-　//ここに周波数チェックいれる0ならエラーで処理終了
   if (!sendChars || charLength <= 0)
     return TM1640_NG;
 
-  // --- Start Condition (データシート準拠) ---
-  //このクラスでスタートコンディションはいらない。むしろ処理終了でハイになる担保を毎度1msはレスポンス低下
+  if (_frequency_khz <= 0)
+    return TM1640_NG;
 
-  // --- Data Transmission ---
   for (int i = 0; i < charLength; ++i) {
     uint8_t data = (uint8_t)sendChars[i];
     bool addStopAfter = (addStopBitAfter1stChar && i == 0);
     bool addStopBefore = (addStopBitBeforLastChar && i == (charLength - 1));
 
-    _sendChar(data, addStopAfter, addStopBefore, half);
+    _sendChar(data, addStopAfter, addStopBefore);
   }
 
-  // --- Stop Condition (通信終了) ---
-  //ここはsclk とdinをハイのみつまり定評のありarduino のライブラリでしっかりhiになればいい
+  // 通信終了時、ラインを安定化
+  digitalWrite(_sclk_pin, HIGH);
+  digitalWrite(_din_pin, HIGH);
 
   return TM1640_OK;
 }
 
-
-
-void TM1640::_sendBit(bool bitVal)
-{
-  // 1ビット送信 — データシート準拠
+void TM1640::_sendBit(bool bitVal){
   digitalWrite(_din_pin, bitVal ? HIGH : LOW);
 
+  // 周波数に基づいた1周期の半分のディレイを設定
+  if (_frequency_khz <= 0) return;  // 周波数が未設定なら即終了（上位が責任を持つ）
+
+  uint32_t halfPeriod_us = 500U / static_cast<uint32_t>(_frequency_khz);
+  if (halfPeriod_us < 1U) halfPeriod_us = 1U;
+
+  // SCLK Low → High トグルで1bitラッチ
   digitalWrite(_sclk_pin, LOW);
-
-//このウエイト周波数がこうりょされていない。
-  delayMicroseconds(1);
+  delayMicroseconds(halfPeriod_us);
   digitalWrite(_sclk_pin, HIGH);
-
-  // 周波数設定を反映（上位で保証済み）
-  uint32_t delay_us = 1000 / static_cast<uint32_t>(_frequency_khz);
-  delayMicroseconds(delay_us);
+  delayMicroseconds(halfPeriod_us);
 }
+
 
 
 
