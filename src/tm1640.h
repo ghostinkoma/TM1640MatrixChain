@@ -21,21 +21,16 @@
 /* display control bit and duty codes (Table 10) */
 #define TM1640_DISPLAY_ON_BIT 0x08u
 
-#define TM1640_DUTY_OFF 0x00u
-#define TM1640_DUTY_1   0x01u
-#define TM1640_DUTY_2   0x02u
-#define TM1640_DUTY_3   0x03u
-#define TM1640_DUTY_4   0x04u
-#define TM1640_DUTY_5   0x05u
-#define TM1640_DUTY_6   0x06u
-#define TM1640_DUTY_7   0x07u
-#define TM1640_DUTY_8   0x08u
-#define TM1640_DUTY_9   0x09u
-#define TM1640_DUTY_10  0x0Au
-#define TM1640_DUTY_11  0x0Bu
-#define TM1640_DUTY_12  0x0Cu
-#define TM1640_DUTY_13  0x0Du
-#define TM1640_DUTY_14  0x0Eu
+/* Brightness (Duty) Levels for TM1640 — datasheet 準拠 */
+#define TM1640_DUTY_1_16   0x00u  /* 1/16 */
+#define TM1640_DUTY_2_16   0x01u  /* 2/16 */
+#define TM1640_DUTY_4_16   0x02u  /* 4/16 */
+#define TM1640_DUTY_10_16  0x03u  /* 10/16 */
+#define TM1640_DUTY_11_16  0x04u  /* 11/16 */
+#define TM1640_DUTY_12_16  0x05u  /* 12/16 */
+#define TM1640_DUTY_13_16  0x06u  /* 13/16 */
+#define TM1640_DUTY_14_16  0x07u  /* 14/16 */
+
 
 /* command constructors */
 #define TM1640_MAKE_DATA_CMD(mode_bits)   ((uint8_t)((TM1640_CMD_DATA_BASE) | ((uint8_t)(mode_bits) & 0x3Fu)))
