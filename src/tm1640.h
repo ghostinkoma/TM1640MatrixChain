@@ -105,10 +105,6 @@ private:
   uint8_t _sclk_pin;
   uint8_t _din_pin;
   int _frequency_khz; /* 0 = use default derived from TM1640_FCPU_HZ */
-
-  /* low-level helpers (implement in .cpp) */
-  void _pinSet(uint8_t pin, bool level);
-  
   int _sendChars(
     char * sendChars,
     bool addStopBitAfter1stChar,
