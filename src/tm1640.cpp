@@ -20,10 +20,24 @@ TM1640::TM1640(uint8_t gpio_sclk,
 }
 
 
-int TM1640::Display(bool on) {
-  (void)on;
-  return TM1640_OK;
+int TM1640::Display(bool on_off){
+  // デフォルト duty（必要に応じて private メンバで管理可）
+  static uint8_t currentDuty = 0x07;  // 14/16 duty（データシート推奨の最大輝度）
+
+  uint8_t cmd = 0x80u;  // Display Control Command base
+
+  if (on_off) {
+    cmd |= 0x08u;  // bit3 = D = 1 → Display ON
+  }
+
+  cmd |= (currentDuty & 0x07u);  // Duty bits設定 (C2–C0)
+
+  char sendBuf[1];
+  sendBuf[0] = static_cast<char>(cmd);
+
+  return _sendChars(sendBuf, false, false, 1);
 }
+
 
 int TM1640::Test(bool start){
   // start=true → Display Test Mode (0x01)
