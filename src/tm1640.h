@@ -18,8 +18,9 @@
 #define TM1640_ADDR_MASK         0x0Fu
 #define TM1640_ADDR_MAX          0x0Fu
 
-/* display control bit and duty codes (Table 10) */
-#define TM1640_DISPLAY_ON_BIT 0x08u
+/* Display Control Bits — TM1640 datasheet 準拠 */
+#define TM1640_DISPLAY_OFF   0x00u  /* D = 0 → Display off */
+#define TM1640_DISPLAY_ON    0x08u  /* D = 1 → Display on  (bit3 set) */
 
 /* Brightness (Duty) Levels for TM1640 — datasheet 準拠 */
 #define TM1640_DUTY_1_16   0x00u  /* 1/16 */
@@ -30,6 +31,9 @@
 #define TM1640_DUTY_12_16  0x05u  /* 12/16 */
 #define TM1640_DUTY_13_16  0x06u  /* 13/16 */
 #define TM1640_DUTY_14_16  0x07u  /* 14/16 */
+
+#define TM1640_MAKE_DISPLAY_CMD(on, duty) \
+  ((uint8_t)(0x80u | ((on) ? TM1640_DISPLAY_ON : TM1640_DISPLAY_OFF) | ((uint8_t)(duty) & 0x07u)))
 
 
 /* command constructors */
