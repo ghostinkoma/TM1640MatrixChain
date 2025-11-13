@@ -25,10 +25,25 @@ int TM1640::Display(bool on) {
   return TM1640_OK;
 }
 
-int TM1640::Test(bool start) {
-  (void)start;
-  return TM1640_OK;
+int TM1640::Test(bool start){
+  // start=true → Display Test Mode (0x01)
+  // start=false → Normal Operation (0x00)
+  uint8_t cmd = start ? 0x01 : 0x00;
+
+  // コマンド送信用バッファ
+  char sendBuf[1];
+  sendBuf[0] = cmd;
+
+  // TM1640 データシート準拠: コマンド送信 (1バイト)
+  int result = _sendChars(sendBuf, false, false, 1);
+
+  // 念のためラインをHighでアイドルに戻す
+  digitalWrite(_sclk_pin, HIGH);
+  digitalWrite(_din_pin, HIGH);
+
+  return result;
 }
+
 
 int TM1640::SetDuty(uint8_t duty) {
   (void)duty;
