@@ -75,18 +75,76 @@ int TM1640::SetDuty(uint8_t duty){
 }
 
 
-int TM1640::DrawAddrInc(const uint8_t *chars, uint16_t len) {
-  (void)chars;
-  (void)len;
+int TM1640::DrawAddrInc(const uint8_t *chars, uint16_t len)
+{
+  if (!chars || len == 0)
+    return TM1640_NG;
+  if (_frequency_khz <= 0)
+    return TM1640_NG;
+
+  // --- 1) データ設定コマンド: アドレス自動加算モード (0x40) ---
+  {
+    char cmdDataMode[1];
+    cmdDataMode[0] = static_cast<char>(0x40);  // アドレス自動加算モード
+    int res = _sendChars(cmdDataMode, false, true, 1);
+    if (res != TM1640_OK) return res;
+  }
+
+  // --- 2) 書き込み開始アドレス (通常は0xC0 + 0x00) ---
+  {
+    char addrCmd[1];
+    addrCmd[0] = static_cast<char>(0xC0);  // 開始アドレス = 0
+    int res = _sendChars(addrCmd, false, false, 1);
+    if (res != TM1640_OK) return res;
+  }
+
+  // --- 3) データ送信 (自動アドレス加算: STOPなしで連続送信) ---
+  int res = _sendChars(reinterpret_cast<char*>(const_cast<uint8_t*>(chars)),
+                       false, true, len);
+  if (res != TM1640_OK) return res;
+
   return TM1640_OK;
 }
 
-int TM1640::DrawAddrFix(uint8_t addr, const uint8_t *chars, uint16_t len) {
-  (void)addr;
-  (void)chars;
-  (void)len;
+
+int TM1640::DrawAddrFix(uint8_t addr, const uint8_t *chars, uint16_t len)
+{
+  if (!chars || len == 0)
+    return TM1640_NG;
+  if (addr > TM1640_ADDR_MAX)
+    return TM1640_NG;
+  if (_frequency_khz <= 0)
+    return TM1640_NG;
+
+  // --- 1) データ設定コマンド: 固定アドレスモード (0x44) ---
+  {
+    char cmdDataMode[1];
+    cmdDataMode[0] = static_cast<char>(0x44);  // 固定アドレスモード
+    int res = _sendChars(cmdDataMode, false, true, 1);
+    if (res != TM1640_OK) return res;
+  }
+
+  // --- 2) 書き込み先アドレス指定 ---
+  {
+    char addrCmd[1];
+    addrCmd[0] = static_cast<char>(0xC0u | (addr & TM1640_ADDR_MASK));
+    int res = _sendChars(addrCmd, false, true, 1);
+    if (res != TM1640_OK) return res;
+  }
+
+  // --- 3) データ送信 (固定アドレスなので1バイトごと STOP 発生) ---
+  for (uint16_t i = 0; i < len; ++i) {
+    char dataByte[1];
+    dataByte[0] = static_cast<char>(chars[i]);
+
+    // 固定アドレスなので毎回 STOP 条件を伴う
+    int res = _sendChars(dataByte, false, true, 1);
+    if (res != TM1640_OK) return res;
+  }
+
   return TM1640_OK;
 }
+
 
 int TM1640::_sendChars(
   char * sendChars,
