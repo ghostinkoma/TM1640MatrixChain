@@ -45,10 +45,21 @@ int TM1640::Test(bool start){
 }
 
 
-int TM1640::SetDuty(uint8_t duty) {
-  (void)duty;
-  return TM1640_OK;
+int TM1640::SetDuty(uint8_t duty){
+  if (duty > 0x07)
+    return TM1640_NG;  // データシート範囲外ならエラー
+
+  // Display ON固定でDuty設定（ユーザーがDisplay()で制御しているなら引数追加も可）
+  uint8_t cmd = 0x88 | (duty & 0x07);  // 0b10001000 | duty
+
+  // コマンドを送信
+  char sendBuf[1];
+  sendBuf[0] = static_cast<char>(cmd);
+
+  // 1バイト送信、ストップビット不要（Display Control Commandは単独命令）
+  return _sendChars(sendBuf, false, false, 1);
 }
+
 
 int TM1640::DrawAddrInc(const uint8_t *chars, uint16_t len) {
   (void)chars;
