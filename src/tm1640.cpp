@@ -161,12 +161,25 @@ int TM1640::_sendChars(
     uint8_t data = (uint8_t)sendChars[i];
     bool addStopAfter = (addStopBitAfter1stChar && i == 0);
     bool addStopBefore = (addStopBitBeforLastChar && i == (charLength - 1));
+    
+   if(i == charLength -1){
+      if(addStopBitBeforLastChar){
+        sendBit(1);
+      }
+    }
 
-    for (int i = 0; i < 8; i++) {
+    for (int j = 0; j < 8; j++) {
       bool bitVal = (data & 0x01);  // LSB 抽出
       _sendBit(bitVal);             // この関数が実際の物理ライン操作
       data >>= 1;                   // LSB-first のため右シフト
     }
+
+    if(i==0){
+      if(addStopBitAfter1stChar){
+        sendBit(1);
+      }
+    }
+    
   }
 
   // 通信終了時、ラインを安定化
