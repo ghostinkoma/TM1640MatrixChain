@@ -164,7 +164,7 @@ int TM1640::_sendChars(
     
    if(i == charLength -1){
       if(addStopBitBeforLastChar){
-        sendBit(1);
+        _sendBit(1);
       }
     }
 
@@ -176,7 +176,7 @@ int TM1640::_sendChars(
 
     if(i==0){
       if(addStopBitAfter1stChar){
-        sendBit(1);
+        _sendBit(1);
       }
     }
     
