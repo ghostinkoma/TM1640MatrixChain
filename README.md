@@ -9,9 +9,6 @@ Supports **chaining**, **rotation**, **U8g2 fonts **, **smooth scrolling**, and 
 - **Bi-color control**: Red, Green, Orange, Off
 - **Chaining**: Up to 255 modules (global coordinates)
 - **Rotation**: 0°, 90°, 270° per module
-- **U8g2 integration**: UTF-8 text, Japanese fonts
-- **Smooth scroll animation** with easing (60 FPS)
-- **High-speed mode** (optional, TM16xx-inspired)
 - **Memory-safe** with null checks and padding
 
 ---
