@@ -162,7 +162,11 @@ int TM1640::_sendChars(
     bool addStopAfter = (addStopBitAfter1stChar && i == 0);
     bool addStopBefore = (addStopBitBeforLastChar && i == (charLength - 1));
 
-    _sendChar(data, addStopAfter, addStopBefore);
+    for (int i = 0; i < 8; i++) {
+      bool bitVal = (data & 0x01);  // LSB 抽出
+      _sendBit(bitVal);             // この関数が実際の物理ライン操作
+      data >>= 1;                   // LSB-first のため右シフト
+    }
   }
 
   // 通信終了時、ラインを安定化
