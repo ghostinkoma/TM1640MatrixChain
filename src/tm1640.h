@@ -11,7 +11,7 @@
 
 #define TM1640_CMD_DATA_FIXED    0x40
 #define TM1640_CMD_ADDRESS_BASE  0xC0
-#define TM1640_CMD_DISPLAY_BASE  0x88u 
+#define TM1640_CMD_DISPLAY_BASE  0x88
 
 /* Brightness (duty) — datasheet defines 8 levels (C2..C0). Use values 0..7. */
 #define TM1640_DUTY_1_16   0x00
