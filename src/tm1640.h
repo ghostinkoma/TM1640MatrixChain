@@ -1,3 +1,19 @@
+/*
+  TM1640MatrixChain – High-Speed TM1640 40×8 Bi-color Matrix Driver
+  Copyright (c) 2025 ghostinkoma (ghostinkoma@gmail.com)
+
+  This work is licensed under the Creative Commons 
+  Attribution-NonCommercial-ShareAlike 4.0 International License (CC BY-NC-SA 4.0).
+  
+  https://creativecommons.org/licenses/by-nc-sa/4.0/
+  
+  You are free to share and adapt this work for non-commercially,
+  provided you give appropriate credit and distribute any derivative works
+  under the same license.
+  
+  For commercial licensing, please contact: ghostinkoma@gmail.com
+*/
+
 #ifndef TM1640_H
 #define TM1640_H
 
