@@ -1,14 +1,12 @@
 # TM1640MatrixChain
 
 High-performance Arduino library for **bi-color 8x8 LED matrix modules** based on **TM1640**.  
-Supports **chaining**, **rotation**, **U8g2 fonts **, **smooth scrolling**, and **high-speed 
+Supports **chaining**, **smooth scrolling**, and **high-speed 
 ---
 
 ## Features
 
 - **Bi-color control**: Red, Green, Orange, Off
-- **Chaining**: Up to 255 modules (global coordinates)
-- **Rotation**: 0°, 90°, 270° per module
 - **Memory-safe** with null checks and padding
 
 ---
@@ -44,8 +42,4 @@ Under the following terms:
 - NonCommercial — You may not use the material for commercial purposes.
 - ShareAlike — If you remix, transform, or build upon the material, you must distribute your contributions under the same license as the original.
 
-Full license text: https://creativecommons.org/licenses/by-nc-sa/4.0/legalcode  
-Human-readable summary: https://creativecommons.org/licenses/by-nc-sa/4.0/
-
-商用利用をご希望の方は、以下のメールアドレスまでご連絡ください。  
 For commercial licensing inquiries: ghostinkoma@gmail.com
