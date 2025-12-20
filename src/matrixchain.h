@@ -1,100 +1,45 @@
-#ifndef TM1640_MATRIX_CHAIN_H
-#define TM1640_MATRIX_CHAIN_H
+#ifndef TM1640MATRIXCHAIN_H
+#define TM1640MATRIXCHAIN_H
 
 #include <Arduino.h>
 #include "TM1640.h"
+#include "font5x7.h"
 
-// =============================================================
-//  定数定義
-// =============================================================
+#define COLOR_NONE   0
+#define COLOR_RED    1
+#define COLOR_GREEN  2
+#define COLOR_ORANGE 3
 
-// --- 回転角度 ---
-#define ANGLE_0     0
-#define ANGLE_90    1
-#define ANGLE_180   2
-#define ANGLE_270   3
+#define MODULE_RESO 8       // 1モジュールあたり8ドット
+#define LEFT_PAD    8       // スクロール用余白
+#define WIDTH       40      // 表示幅（5モジュール × 8）
+#define HEIGHT      8
 
-// --- カラー定義 ---
-#define COLOR_NONE  0
-#define COLOR_RED   1
-#define COLOR_GREEN 2
-#define COLOR_ORANGE 3   // RED + GREEN
+#define RightToLeft 0
+#define LeftToRight 1
 
-// =============================================================
-//  モジュール構造体
-// =============================================================
-struct TM1640ModuleInfo {
-    TM1640* dev;     // 対応するTM1640インスタンス
-    uint8_t rotation; // ANGLE_0〜270
-};
-
-// =============================================================
-//  TM1640MatrixChain クラス宣言
-// =============================================================
 class TM1640MatrixChain {
 public:
-    // ---------------------------------------------------------
-    // コンストラクタ／デストラクタ
-    // ---------------------------------------------------------
-    TM1640MatrixChain(TM1640ModuleInfo* modules,
-                      uint8_t moduleCount,
-                      uint8_t rows,
-                      uint8_t cols);
+    TM1640MatrixChain(uint8_t sclk, const uint8_t dinPins[], uint8_t moduleCount,
+                      uint8_t displayDuty = TM1640_DUTY_14_16);
+
     ~TM1640MatrixChain();
 
-    // ---------------------------------------------------------
-    // 初期化・状態制御
-    // ---------------------------------------------------------
-    void begin();             // メモリ初期化など
-    void clearVirtual();      // 仮想VRAM全消去
-    void clearDisplay();      // 表示領域のみ消去
-
-    // ---------------------------------------------------------
-    // 描画操作（仮想バッファ側）
-    // ---------------------------------------------------------
-    void drawPixelVirtual(int16_t x, int16_t y, uint8_t color);
-
-    // 仮想→表示バッファ転送（必要領域のみコピー）
-    void blitToDisplay();
-
-    // 実ハードウェア更新
-    void update();
-
-    // ---------------------------------------------------------
-    // 情報取得
-    // ---------------------------------------------------------
-    uint16_t width()  const { return _virtWidth; }
-    uint16_t height() const { return _virtHeight; }
+    void SetDuty(uint8_t duty);
+    void clearExtFrame();
+    void drawDotExt(int x, int y, uint8_t color);
+    void flushFrameExtToDisplay();
+    void appendChar(char ch, int x, int y, uint8_t color);
+    void Scroll(uint8_t dir);
+    void ScrollString(const char *dispStr, uint8_t color, uint16_t scrollDelayMs = 50);
 
 private:
-    // ---------------------------------------------------------
-    // 内部処理
-    // ---------------------------------------------------------
-    uint8_t _mapToModule(int16_t x, int16_t y,
-                         int16_t& localX, int16_t& localY) const;
-
-    // ---------------------------------------------------------
-    // メンバ変数
-    // ---------------------------------------------------------
-    TM1640ModuleInfo* _modules;
+    TM1640** _modules;
     uint8_t  _moduleCount;
-
-    uint8_t  _rows;           // モジュール縦配置数
-    uint8_t  _cols;           // モジュール横配置数
-
-    // 仮想バッファ（周囲±1マージン付き）
-    uint16_t _virtWidth;      // cols * 8 + 2
-    uint16_t _virtHeight;     // rows * 8 + 2
-    uint8_t* _vramRed;
-    uint8_t* _vramGreen;
-
-    // 実表示バッファ
-    uint16_t _dispWidth;      // cols * 8
-    uint16_t _dispHeight;     // rows * 8
-    uint8_t* _dispRed;
-    uint8_t* _dispGreen;
+    uint16_t _extWidth;
+    uint8_t* _frameExtR;
+    uint8_t* _frameExtG;
+    uint8_t  DisplayDuty;
 };
 
-#endif // TM1640_MATRIX_CHAIN_H
-
-
+#endif // TM1640MATRIXCHAIN_H
